@@ -4,64 +4,61 @@ import Navbar from '../components/Navbar'
 import { Link } from 'react-router-dom'
 
 const MenPage = () => {
+  const [selectedProduct, setSelectedProduct] = useState([])
+  const uniqueBrands = [...new Set(menData.map(item => item.brand))]
 
-    const [selectedProduct, setSelectedProduct] = useState([])
-
-    const companyHandler=(mango)=>{
-            if(selectedProduct.includes(mango)){
-                setSelectedProduct(selectedProduct.filter(item => item !== mango))
-            }else{
-                setSelectedProduct([...selectedProduct, mango]) 
-            }
+  const companyHandler = (brand) => {
+    if (selectedProduct.includes(brand)) {
+      setSelectedProduct(selectedProduct.filter(item => item !== brand))
+    } else {
+      setSelectedProduct([...selectedProduct, brand])
     }
+  }
 
+  const filteredProduct = selectedProduct.length === 0
+    ? menData
+    : menData.filter(item => selectedProduct.includes(item.brand))
 
-    const filteredProduct = selectedProduct.length===0?
-        menData : menData.filter((orange)=>selectedProduct.includes(orange.brand))
-
-return (
-<>
-<Navbar />
-<div className="fullpage">
-    
-<div className="pro-selected">
-
-{menData.map((phone)=>{
-    return(
-        <div className='pro-input'>
-            <label >
-                <input type="checkbox" 
-                checked = {selectedProduct.includes(phone.brand)}
-                onChange={()=>companyHandler(phone.brand)}
+  return (
+    <>
+      <Navbar />
+      <div className="fullpage">
+        <div className="pro-selected">
+          <h3>Filter by Brand</h3>
+          <div className="pro-input">
+            {uniqueBrands.map((brand) => (
+              <label key={brand}>
+                <input
+                  type="checkbox"
+                  checked={selectedProduct.includes(brand)}
+                  onChange={() => companyHandler(brand)}
                 />
-                {phone.brand}
-            </label>
+                {brand}
+              </label>
+            ))}
+          </div>
+          {selectedProduct.length > 0 && (
+            <button className="clear-filter" onClick={() => setSelectedProduct([])}>
+              Clear filters
+            </button>
+          )}
         </div>
-    )
-})}
-
-</div>
-
-<div className='pageSection'>
-    {filteredProduct.map((item)=>{
-        return(
-            <div>
-
-            <Link to={`/men/${item.id}`}>
-                <div className="pageImg">
-                    <img src={item.image} alt="" />
+        <div className="pageSection">
+          {filteredProduct.map((item) => (
+            <Link to={`/men/${item.id}`} className="custom-link" key={item.id}>
+              <div className="pageImg">
+                <img src={item.image} alt={item.model} />
+                <div className="pageImg-info">
+                  <span className="pageImg-brand">{item.brand}</span>
+                  <span className="pageImg-model">{item.model}</span>
+                  <span className="pageImg-price">${item.price}</span>
                 </div>
+              </div>
             </Link>
-                <div className="proModel">
-                    {item.brand}, {item.model}
-                </div>
-            </div>
-        )
-    })}
-
- </div>
-</div>
-</>
+          ))}
+        </div>
+      </div>
+    </>
   )
 }
 
